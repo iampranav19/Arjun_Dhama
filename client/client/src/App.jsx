@@ -104,6 +104,10 @@ function App() {
   // METRICS
   const totalDeployments = deployments.length;
 
+  const pendingDeployments = deployments.filter(
+    (d) => d.status === "Pending"
+  ).length;
+
   const runningDeployments = deployments.filter(
     (d) => d.status === "Running"
   ).length;
@@ -160,6 +164,11 @@ function App() {
         <div className="metric-card">
           <h3>Total Deployments</h3>
           <p>{totalDeployments}</p>
+        </div>
+
+        <div className="metric-card pending-card">
+          <h3>Pending</h3>
+          <p>{pendingDeployments}</p>
         </div>
 
         <div className="metric-card running-card">
