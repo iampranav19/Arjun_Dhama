@@ -3,20 +3,18 @@ import axios from "axios";
 import "./App.css";
 
 function App() {
+
   const [formData, setFormData] = useState({
     clientName: "",
     domain: "",
     image: "",
   });
 
-  const [deploymentId, setDeploymentId] = useState(null);
-
-  const [deploymentStatus, setDeploymentStatus] =
-    useState("");
+  const [deployments, setDeployments] = useState([]);
 
   const [loading, setLoading] = useState(false);
 
-  // Handle input changes
+  // Handle Input Change
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -24,63 +22,69 @@ function App() {
     });
   };
 
-  // Submit deployment
+  // Fetch Deployments
+  const fetchDeployments = async () => {
+    try {
+
+      const response = await axios.get(
+        "http://localhost:5000/api/deployments"
+      );
+
+      setDeployments(response.data);
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // Submit Deployment
   const handleDeploy = async () => {
-  try {
-    setLoading(true);
+    try {
 
-    const response = await axios.post(
-      "http://localhost:5000/api/deploy",
-      formData
-    );
+      setLoading(true);
 
-    setDeploymentId(response.data.deploymentId);
+      await axios.post(
+        "http://localhost:5000/api/deploy",
+        formData
+      );
 
-    setDeploymentStatus(response.data.status);
+      // Clear Form
+      setFormData({
+        clientName: "",
+        domain: "",
+        image: "",
+      });
 
-    // Clear form after deployment
-    setFormData({
-      clientName: "",
-      domain: "",
-      image: "",
-    });
+      // Refresh Deployments
+      fetchDeployments();
 
-    setLoading(false);
+      setLoading(false);
 
-  } catch (error) {
-    console.error(error);
-    setLoading(false);
-  }
-};
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+    }
+  };
 
-  // Poll deployment status
+  // Polling
   useEffect(() => {
 
-    if (!deploymentId) return;
+    fetchDeployments();
 
-    const interval = setInterval(async () => {
-      try {
-
-        const response = await axios.get(
-          `http://localhost:5000/api/status/${deploymentId}`
-        );
-
-        setDeploymentStatus(response.data.status);
-
-      } catch (error) {
-        console.error(error);
-      }
+    const interval = setInterval(() => {
+      fetchDeployments();
     }, 3000);
 
     return () => clearInterval(interval);
 
-  }, [deploymentId]);
+  }, []);
 
   return (
     <div className="container">
 
       <h1>🚀 Deployment Control Panel</h1>
 
+      {/* FORM */}
       <div className="form">
 
         <input
@@ -113,39 +117,48 @@ function App() {
 
       </div>
 
-      {deploymentId && (
-        <div className="status-card">
+      {/* DASHBOARD */}
+      <div className="dashboard">
 
-          <h2>🚀 Deployment Status</h2>
+        <h2>Deployment History</h2>
 
-          <div className="info-box">
+        <div className="table">
 
-            <div className="label">
-              Deployment ID
-            </div>
-
-            <div className="value">
-              {deploymentId}
-            </div>
-
+          <div className="table-header">
+            <div>Client</div>
+            <div>Domain</div>
+            <div>Image</div>
+            <div>Status</div>
           </div>
 
-          <div className="status-wrapper">
-
-            <div className="status-text">
-              Current Status
-            </div>
+          {deployments.map((deployment) => (
 
             <div
-              className={`status ${deploymentStatus.toLowerCase()}`}
+              className="table-row"
+              key={deployment._id}
             >
-              {deploymentStatus}
+
+              <div>{deployment.clientName}</div>
+
+              <div>{deployment.domain}</div>
+
+              <div>{deployment.image}</div>
+
+              <div>
+                <span
+                  className={`status ${deployment.status.toLowerCase()}`}
+                >
+                  {deployment.status}
+                </span>
+              </div>
+
             </div>
 
-          </div>
+          ))}
 
         </div>
-      )}
+
+      </div>
 
     </div>
   );
