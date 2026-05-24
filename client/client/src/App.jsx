@@ -14,6 +14,12 @@ function App() {
 
   const [loading, setLoading] = useState(false);
 
+  // SEARCH + FILTER STATES
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const [statusFilter, setStatusFilter] =
+    useState("All");
+
   // Handle Input Change
   const handleChange = (e) => {
     setFormData({
@@ -48,14 +54,13 @@ function App() {
         formData
       );
 
-      // Clear Form
+      // Clear form
       setFormData({
         clientName: "",
         domain: "",
         image: "",
       });
 
-      // Refresh Deployments
       fetchDeployments();
 
       setLoading(false);
@@ -78,6 +83,23 @@ function App() {
     return () => clearInterval(interval);
 
   }, []);
+
+  // FILTER LOGIC
+  const filteredDeployments = deployments.filter(
+    (deployment) => {
+
+      const matchesSearch =
+        deployment.clientName
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
+
+      const matchesStatus =
+        statusFilter === "All" ||
+        deployment.status === statusFilter;
+
+      return matchesSearch && matchesStatus;
+    }
+  );
 
   return (
     <div className="container">
@@ -122,6 +144,34 @@ function App() {
 
         <h2>Deployment History</h2>
 
+        {/* SEARCH + FILTER */}
+        <div className="controls">
+
+          <input
+            type="text"
+            placeholder="Search by client..."
+            value={searchTerm}
+            onChange={(e) =>
+              setSearchTerm(e.target.value)
+            }
+          />
+
+          <select
+            value={statusFilter}
+            onChange={(e) =>
+              setStatusFilter(e.target.value)
+            }
+          >
+            <option value="All">All</option>
+            <option value="Pending">Pending</option>
+            <option value="Running">Running</option>
+            <option value="Completed">Completed</option>
+            <option value="Failed">Failed</option>
+          </select>
+
+        </div>
+
+        {/* TABLE */}
         <div className="table">
 
           <div className="table-header">
@@ -131,7 +181,7 @@ function App() {
             <div>Status</div>
           </div>
 
-          {deployments.map((deployment) => (
+          {filteredDeployments.map((deployment) => (
 
             <div
               className="table-row"

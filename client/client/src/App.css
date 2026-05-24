@@ -175,6 +175,47 @@ button:hover {
   color: #f8fafc;
 }
 
+/* SEARCH + FILTER CONTROLS */
+
+.controls {
+  display: flex;
+
+  gap: 20px;
+
+  margin-bottom: 25px;
+}
+
+.controls input,
+.controls select {
+  flex: 1;
+
+  padding: 16px;
+
+  border-radius: 14px;
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  background: rgba(255,255,255,0.04);
+
+  color: white;
+
+  font-size: 14px;
+
+  outline: none;
+}
+
+.controls select {
+  max-width: 220px;
+
+  cursor: pointer;
+}
+
+.controls option {
+  background: #111827;
+}
+
+/* TABLE */
+
 .table {
   width: 100%;
 
@@ -244,6 +285,8 @@ button:hover {
   text-overflow: ellipsis;
 }
 
+/* STATUS BADGES */
+
 .status {
   width: fit-content;
 
@@ -292,7 +335,17 @@ button:hover {
   border: 1px solid rgba(239,68,68,0.25);
 }
 
+/* RESPONSIVE */
+
 @media (max-width: 900px) {
+
+  .controls {
+    flex-direction: column;
+  }
+
+  .controls select {
+    max-width: 100%;
+  }
 
   .table-header,
   .table-row {
