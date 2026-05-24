@@ -14,7 +14,7 @@ function App() {
 
   const [loading, setLoading] = useState(false);
 
-  // SEARCH + FILTER STATES
+  // SEARCH + FILTER
   const [searchTerm, setSearchTerm] = useState("");
 
   const [statusFilter, setStatusFilter] =
@@ -54,7 +54,7 @@ function App() {
         formData
       );
 
-      // Clear form
+      // Clear Form
       setFormData({
         clientName: "",
         domain: "",
@@ -101,6 +101,21 @@ function App() {
     }
   );
 
+  // METRICS
+  const totalDeployments = deployments.length;
+
+  const runningDeployments = deployments.filter(
+    (d) => d.status === "Running"
+  ).length;
+
+  const completedDeployments = deployments.filter(
+    (d) => d.status === "Completed"
+  ).length;
+
+  const failedDeployments = deployments.filter(
+    (d) => d.status === "Failed"
+  ).length;
+
   return (
     <div className="container">
 
@@ -136,6 +151,31 @@ function App() {
         <button onClick={handleDeploy}>
           {loading ? "Deploying..." : "Deploy"}
         </button>
+
+      </div>
+
+      {/* METRICS */}
+      <div className="metrics">
+
+        <div className="metric-card">
+          <h3>Total Deployments</h3>
+          <p>{totalDeployments}</p>
+        </div>
+
+        <div className="metric-card running-card">
+          <h3>Running</h3>
+          <p>{runningDeployments}</p>
+        </div>
+
+        <div className="metric-card completed-card">
+          <h3>Completed</h3>
+          <p>{completedDeployments}</p>
+        </div>
+
+        <div className="metric-card failed-card">
+          <h3>Failed</h3>
+          <p>{failedDeployments}</p>
+        </div>
 
       </div>
 
